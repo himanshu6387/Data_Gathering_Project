@@ -18,15 +18,15 @@ connectDB();
 
 // ✅ Allowed Origins
 const allowedOrigins = [
-  "https://data-gathering-project.vercel.app", // your frontend
-  "http://localhost:5173", // for local testing (optional)
+  "https://data-gathering-project.vercel.app", // frontend (Vercel)
+  "http://localhost:5173", // local dev (optional)
 ];
 
 // ✅ CORS Configuration
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or Postman)
+      // allow requests with no origin (e.g., mobile apps or Postman)
       if (!origin) return callback(null, true);
       if (!allowedOrigins.includes(origin)) {
         return callback(new Error("Not allowed by CORS"), false);
@@ -34,14 +34,15 @@ app.use(
       return callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// // ✅ Handle Preflight Requests
-// app.options("*", cors());
+// ✅ Must handle preflight requests globally
+app.options("*", cors());
 
-// ✅ Increase JSON Body Limit
+// ✅ JSON body limits
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -51,15 +52,16 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/college", collegeRoutes);
 app.use("/api/student", studentRoutes);
 
-// ✅ Server Listen
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+// ✅ Root route (for health check)
+app.get("/", (req, res) => {
+  res.send("✅ Data Gathering API is running successfully!");
 });
 
-
-
-
+// ✅ Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
 
 
 
