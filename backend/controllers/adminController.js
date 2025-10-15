@@ -1,15 +1,17 @@
 // controllers/adminController.js
 import User from '../models/userModel.js';
-import { v4 as uuidv4 } from 'uuid';
 import StudentLink from '../models/studentLink.js';
 import Student from '../models/studentModel.js';
+import bcrypt from 'bcryptjs'; // ✅ for password hashing
 
 export const createCollege = async (req, res) => {
   try {
-    const { collegeName, email } = req.body;
+    const { collegeName, email, password } = req.body; // ✅ Admin provides password
 
-    // Generate random password
-    const password = uuidv4().slice(0, 8);
+    // Validate input
+    if (!collegeName || !email || !password) {
+      return res.status(400).json({ message: 'College name, email, and password are required' });
+    }
 
     // Check if college already exists
     const existingCollege = await User.findOne({ email });
@@ -17,9 +19,12 @@ export const createCollege = async (req, res) => {
       return res.status(400).json({ message: 'College with this email already exists' });
     }
 
+    // ✅ Hash the admin-provided password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const college = new User({
       email,
-      password,
+      password: hashedPassword,
       role: 'college',
       collegeName,
       createdBy: req.user.id
@@ -32,14 +37,15 @@ export const createCollege = async (req, res) => {
       college: {
         _id: college._id,
         email: college.email,
-        collegeName: college.collegeName,
-        generatedPassword: password
+        collegeName: college.collegeName
       }
     });
   } catch (error) {
+    console.error('Error creating college:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const getAllColleges = async (req, res) => {
   try {
