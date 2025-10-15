@@ -35,7 +35,7 @@ const StudentForm = () => {
 
   const fetchLinkDetails = async () => {
     try {
-      const response = await axios.get(`https://data-gathering-project.onrender.com/api/student/link/${linkId}`);
+      const response = await axios.get(`https://data-gathering-project-backendd.onrender.com/api/student/link/${linkId}`);
       setLinkDetails(response.data);
     } catch (error) {
       toast.error('Invalid or expired link');
