@@ -135,7 +135,7 @@ const StudentForm = () => {
       submitData.append('admissionNo', formData.admissionNo);
       submitData.append('email', formData.email);
       
-      await axios.post(`https://data-gathering-project.onrender.com/api/student/submit/${linkId}`, submitData, {
+      await axios.post(`https://data-gathering-project-backendd.onrender.com/api/student/submit/${linkId}`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
