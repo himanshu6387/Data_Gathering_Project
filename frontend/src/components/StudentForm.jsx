@@ -35,7 +35,7 @@ const StudentForm = () => {
 
   const fetchLinkDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/student/link/${linkId}`);
+      const response = await axios.get(`https://data-gathering-project.onrender.com/api/student/link/${linkId}`);
       setLinkDetails(response.data);
     } catch (error) {
       toast.error('Invalid or expired link');
@@ -135,7 +135,7 @@ const StudentForm = () => {
       submitData.append('admissionNo', formData.admissionNo);
       submitData.append('email', formData.email);
       
-      await axios.post(`http://localhost:5000/api/student/submit/${linkId}`, submitData, {
+      await axios.post(`https://data-gathering-project.onrender.com/api/student/submit/${linkId}`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

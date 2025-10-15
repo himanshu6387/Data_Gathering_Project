@@ -10,7 +10,7 @@ const LandingPage = () => {
     {
       title: "Streamline College Management",
       description: "Manage multiple colleges, collect student data, and generate reports effortlessly",
-      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=600&fit=crop",
+      image: "https://images.pexels.com/photos/17792676/pexels-photo-17792676.jpeg",
       gradient: "from-blue-600 to-indigo-600"
     },
     {
@@ -22,7 +22,7 @@ const LandingPage = () => {
     {
       title: "Powerful Analytics & Reports",
       description: "Download student data in Excel format and images in ZIP with one click",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
+      image: "https://images.pexels.com/photos/7723717/pexels-photo-7723717.jpeg",
       gradient: "from-green-600 to-teal-600"
     }
   ];
@@ -114,13 +114,13 @@ const LandingPage = () => {
             <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-90`}></div>
             <img
               src={slide.image}
-              alt={slide.title}
+              // alt={slide.title}
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
               <div className="max-w-2xl text-white animate-fade-in-up">
-                <h1 className="text-5xl md:text-6xl font-bold mb-6">{slide.title}</h1>
-                <p className="text-xl text-gray-200 max-w-3xl mx-auto">{slide.description}</p>
+                <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white" style={{textShadow:'3px 3px red'}}>{slide.title}</h1>
+                <p className="text-xl text-white max-w-3xl mx-auto" style={{textShadow:'1px 1px red'}} >{slide.description}</p>
               </div>
             </div>
           </div>
