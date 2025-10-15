@@ -38,8 +38,8 @@ app.use(
   })
 );
 
-// ✅ Handle Preflight Requests
-app.options("*", cors());
+// // ✅ Handle Preflight Requests
+// app.options("*", cors());
 
 // ✅ Increase JSON Body Limit
 app.use(express.json({ limit: "10mb" }));
