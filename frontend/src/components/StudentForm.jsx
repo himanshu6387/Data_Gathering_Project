@@ -11,6 +11,7 @@ const StudentForm = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 3;
   
   // Image Editor States
   const [showImageEditor, setShowImageEditor] = useState(false);
@@ -20,7 +21,7 @@ const StudentForm = () => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [cropShape, setCropShape] = useState('round'); // 'round' or 'rect'
+  const [cropShape, setCropShape] = useState('round');
   const [removingBg, setRemovingBg] = useState(false);
   const [bgRemoved, setBgRemoved] = useState(false);
   
@@ -38,9 +39,11 @@ const StudentForm = () => {
     email: ''
   });
 
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     fetchLinkDetails();
-  }, []);
+  }, [linkId]);
 
   const fetchLinkDetails = async () => {
     try {
@@ -75,7 +78,6 @@ const StudentForm = () => {
   const handleRemoveBackground = async () => {
     setRemovingBg(true);
     try {
-      // Send image to backend for background removal
       const response = await axios.post('https://data-gathering-project-backendd.onrender.com/api/student/remove-background', {
         image: originalImage
       });
@@ -95,12 +97,11 @@ const StudentForm = () => {
       const croppedImage = await getCroppedImg(
         originalImage,
         croppedAreaPixels,
-        cropShape === 'round' ? 0 : 90 // rotation
+        cropShape === 'round' ? 0 : 90
       );
       
       setImagePreview(croppedImage);
       
-      // Convert to File object
       const response = await fetch(croppedImage);
       const blob = await response.blob();
       const file = new File([blob], 'student-photo.jpg', { type: 'image/jpeg' });
@@ -119,14 +120,52 @@ const StudentForm = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error when user starts typing
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: ''
+      });
+    }
+  };
+
+  const validateStep = (step) => {
+    const newErrors = {};
+    
+    if (step === 1) {
+      if (!imageFile) newErrors.studentImage = 'Student image is required';
+      if (!formData.name) newErrors.name = 'Name is required';
+      if (!formData.dob) newErrors.dob = 'Date of birth is required';
+      if (!formData.fatherName) newErrors.fatherName = "Father's name is required";
+      if (!formData.motherName) newErrors.motherName = "Mother's name is required";
+      if (!formData.aadhar) newErrors.aadhar = 'Aadhar number is required';
+      else if (formData.aadhar.length !== 12) newErrors.aadhar = 'Aadhar must be 12 digits';
+    }
+    
+    if (step === 2) {
+      if (!formData.class) newErrors.class = 'Class is required';
+      if (!formData.section) newErrors.section = 'Section is required';
+      if (!formData.admissionNo) newErrors.admissionNo = 'Admission number is required';
+    }
+    
+    if (step === 3) {
+      if (!formData.phone) newErrors.phone = 'Phone number is required';
+      else if (formData.phone.length !== 10) newErrors.phone = 'Phone must be 10 digits';
+      if (!formData.email) newErrors.email = 'Email is required';
+      else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+      if (!formData.address) newErrors.address = 'Address is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
-    if (currentStep === 1 && !imageFile) {
-      toast.error('Please upload and crop student image');
-      return;
+    if (validateStep(currentStep)) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      toast.error('Please fill all required fields correctly');
     }
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
@@ -136,8 +175,8 @@ const StudentForm = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     
-    if (!imageFile) {
-      toast.error('Please upload student image');
+    if (!validateStep(currentStep)) {
+      toast.error('Please fill all required fields correctly');
       return;
     }
     
@@ -188,14 +227,24 @@ const StudentForm = () => {
   if (submitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center">
-          <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center animate-fade-in-up">
+          <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
             </svg>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Success!</h2>
-          <p className="text-gray-600 text-lg">Your registration has been submitted successfully.</p>
+          <p className="text-gray-600 text-lg mb-2">
+            Your registration has been submitted successfully.
+          </p>
+          <p className="text-gray-500 text-sm mb-6">
+            Thank you for registering with <span className="font-semibold text-indigo-600">{linkDetails.collegeName}</span>
+          </p>
+          <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-4 border border-green-200">
+            <p className="text-sm text-gray-600">
+              You will receive a confirmation email shortly with your registration details.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -204,45 +253,72 @@ const StudentForm = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
+        {/* Header */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl mb-4 transform hover:rotate-12 transition-transform duration-300">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">{linkDetails.collegeName}</h1>
           <p className="text-lg text-gray-600">Student Registration Form</p>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8">
+        <div className="mb-8 animate-fade-in-up">
           <div className="flex items-center justify-between mb-2">
             {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center flex-1">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
-                  currentStep >= step ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-all duration-300 ${
+                  currentStep >= step 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white transform scale-110' 
+                    : 'bg-gray-200 text-gray-600'
                 }`}>
-                  {step}
+                  {currentStep > step ? (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  ) : (
+                    step
+                  )}
                 </div>
-                {step < 3 && <div className={`flex-1 h-1 mx-2 ${currentStep > step ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>}
+                {step < 3 && (
+                  <div className={`flex-1 h-1 mx-2 rounded transition-all duration-300 ${
+                    currentStep > step ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : 'bg-gray-200'
+                  }`}></div>
+                )}
               </div>
             ))}
           </div>
+          <div className="flex justify-between text-xs text-gray-600 font-medium">
+            <span>Personal Info</span>
+            <span>Academic Details</span>
+            <span>Contact Info</span>
+          </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        {/* Form Card */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
             <h2 className="text-2xl font-bold text-white">
               {currentStep === 1 && 'Personal Information'}
               {currentStep === 2 && 'Academic Details'}
               {currentStep === 3 && 'Contact Information'}
             </h2>
+            <p className="text-indigo-100 mt-1">Step {currentStep} of {totalSteps}</p>
           </div>
 
           <form onSubmit={onSubmit} className="p-8">
+            {/* Step 1: Personal Information */}
             {currentStep === 1 && (
-              <div className="space-y-6">
-                {/* Image Upload with Editor */}
+              <div className="space-y-6 animate-fade-in-up">
+                {/* Image Upload */}
                 <div className="flex flex-col items-center mb-8">
-                  <label className="block text-sm font-semibold text-gray-700 mb-4">Student Photograph *</label>
-                  
+                  <label className="block text-sm font-semibold text-gray-700 mb-4">
+                    Student Photograph *
+                  </label>
                   <div className="relative">
-                    <div className={`w-40 h-40 ${cropShape === 'round' ? 'rounded-full' : 'rounded-2xl'} border-4 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50`}>
+                    <div className="w-40 h-40 rounded-full border-4 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 hover:border-indigo-500 transition-all duration-300">
                       {imagePreview ? (
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
@@ -254,121 +330,270 @@ const StudentForm = () => {
                         </div>
                       )}
                     </div>
-                    <label className="absolute bottom-0 right-0 bg-indigo-600 text-white p-3 rounded-full cursor-pointer hover:bg-indigo-700 shadow-lg">
+                    <label className="absolute bottom-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3 rounded-full cursor-pointer hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-110 shadow-lg">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
                     </label>
                   </div>
-                  
                   {imagePreview && (
                     <button
                       type="button"
                       onClick={() => setShowImageEditor(true)}
-                      className="mt-4 text-indigo-600 hover:text-indigo-800 font-semibold text-sm"
+                      className="mt-4 text-indigo-600 hover:text-indigo-800 font-semibold text-sm flex items-center space-x-1"
                     >
-                      ✏️ Edit Image
+                      <span>✏️</span>
+                      <span>Edit Image</span>
                     </button>
                   )}
+                  {errors.studentImage && <p className="text-red-500 text-sm mt-2">{errors.studentImage}</p>}
+                  <p className="text-xs text-gray-500 mt-3">PNG, JPG up to 5MB</p>
                 </div>
 
-                {/* Form Fields */}
+                {/* Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
-                  <input type="text" name="name" value={formData.name} onChange={handleInputChange} 
-                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Enter full name"
+                  />
+                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
 
+                {/* DOB */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Date of Birth *</label>
-                  <input type="date" name="dob" value={formData.dob} onChange={handleInputChange}
-                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                  <input
+                    type="date"
+                    name="dob"
+                    value={formData.dob}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                  {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob}</p>}
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                {/* Parent Names */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Father's Name *</label>
-                    <input type="text" name="fatherName" value={formData.fatherName} onChange={handleInputChange}
-                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                    <input
+                      type="text"
+                      name="fatherName"
+                      value={formData.fatherName}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Enter father's name"
+                    />
+                    {errors.fatherName && <p className="text-red-500 text-sm mt-1">{errors.fatherName}</p>}
                   </div>
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Mother's Name *</label>
-                    <input type="text" name="motherName" value={formData.motherName} onChange={handleInputChange}
-                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                    <input
+                      type="text"
+                      name="motherName"
+                      value={formData.motherName}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Enter mother's name"
+                    />
+                    {errors.motherName && <p className="text-red-500 text-sm mt-1">{errors.motherName}</p>}
                   </div>
                 </div>
 
+                {/* Aadhar */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Aadhar Number *</label>
-                  <input type="text" name="aadhar" value={formData.aadhar} onChange={handleInputChange}
-                    maxLength="12" className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                  <input
+                    type="text"
+                    name="aadhar"
+                    value={formData.aadhar}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Enter 12-digit Aadhar number"
+                    maxLength="12"
+                  />
+                  {errors.aadhar && <p className="text-red-500 text-sm mt-1">{errors.aadhar}</p>}
                 </div>
               </div>
             )}
 
+            {/* Step 2: Academic Details */}
             {currentStep === 2 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-6 animate-fade-in-up">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Class *</label>
-                    <input type="text" name="class" value={formData.class} onChange={handleInputChange}
-                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                    <input
+                      type="text"
+                      name="class"
+                      value={formData.class}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., 10th, B.Tech"
+                    />
+                    {errors.class && <p className="text-red-500 text-sm mt-1">{errors.class}</p>}
                   </div>
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Section *</label>
-                    <input type="text" name="section" value={formData.section} onChange={handleInputChange}
-                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                    <input
+                      type="text"
+                      name="section"
+                      value={formData.section}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="e.g., A, B, CS"
+                    />
+                    {errors.section && <p className="text-red-500 text-sm mt-1">{errors.section}</p>}
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Admission Number *</label>
-                  <input type="text" name="admissionNo" value={formData.admissionNo} onChange={handleInputChange}
-                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                  <input
+                    type="text"
+                    name="admissionNo"
+                    value={formData.admissionNo}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Enter admission number"
+                  />
+                  {errors.admissionNo && <p className="text-red-500 text-sm mt-1">{errors.admissionNo}</p>}
                 </div>
               </div>
             )}
 
+            {/* Step 3: Contact Info */}
             {currentStep === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-6 animate-fade-in-up">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
-                  <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange}
-                    maxLength="10" className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="10-digit mobile number"
+                    maxLength="10"
+                  />
+                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange}
-                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500" required />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="student@example.com"
+                  />
+                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Residential Address *</label>
-                  <textarea name="address" value={formData.address} onChange={handleInputChange} rows={4}
-                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 resize-none" required />
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                    placeholder="Enter complete residential address"
+                  />
+                  {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+                </div>
+
+                {/* Review Summary */}
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Review Your Information</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 mb-1">Name:</p>
+                      <p className="font-semibold text-gray-900">{formData.name || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 mb-1">Admission No:</p>
+                      <p className="font-semibold text-gray-900">{formData.admissionNo || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 mb-1">Class:</p>
+                      <p className="font-semibold text-gray-900">{formData.class || '-'} - {formData.section || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 mb-1">Email:</p>
+                      <p className="font-semibold text-gray-900 truncate">{formData.email || '-'}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            <div className="flex justify-between items-center mt-8 pt-6 border-t">
-              {currentStep > 1 && (
-                <button type="button" onClick={prevStep}
-                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300">
-                  Previous
-                </button>
-              )}
-              
-              {currentStep < 3 ? (
-                <button type="button" onClick={nextStep}
-                  className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 ml-auto">
-                  Next Step
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+              {currentStep > 1 ? (
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="flex items-center space-x-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Previous</span>
                 </button>
               ) : (
-                <button type="submit" disabled={loading}
-                  className="px-8 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 ml-auto">
-                  {loading ? 'Submitting...' : 'Submit Registration'}
+                <div></div>
+              )}
+
+              {currentStep < totalSteps ? (
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg ml-auto"
+                >
+                  <span>Next Step</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl font-semibold hover:from-green-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg ml-auto"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Submit Registration</span>
+                    </>
+                  )}
                 </button>
               )}
             </div>
@@ -490,7 +715,6 @@ const StudentForm = () => {
 };
 
 export default StudentForm;
-
 
 // import React, { useState, useEffect } from 'react';
 // import { useParams } from 'react-router-dom';
