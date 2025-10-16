@@ -159,7 +159,7 @@ const StudentForm = () => {
       submitData.append('email', formData.email);
       
       await axios.post(
-        `http://localhost:5000/api/student/submit/${linkId}`,
+        `https://data-gathering-project-backendd.onrender.com/api/student/submit/${linkId}`,
         submitData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
