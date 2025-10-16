@@ -44,7 +44,7 @@ const StudentForm = () => {
 
   const fetchLinkDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/student/link/${linkId}`);
+      const response = await axios.get(`https://data-gathering-project-backendd.onrender.com/api/student/link/${linkId}`);
       setLinkDetails(response.data);
     } catch (error) {
       toast.error('Invalid or expired link');
@@ -76,7 +76,7 @@ const StudentForm = () => {
     setRemovingBg(true);
     try {
       // Send image to backend for background removal
-      const response = await axios.post('http://localhost:5000/api/student/remove-background', {
+      const response = await axios.post('https://data-gathering-project-backendd.onrender.com/api/student/remove-background', {
         image: originalImage
       });
       
