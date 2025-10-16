@@ -2,6 +2,7 @@ import Student from '../models/studentModel.js';
 import StudentLink from '../models/studentLink.js';
 import dotenv from 'dotenv'
 import { v2 as cloudinary } from 'cloudinary';
+import { removeBackground } from '@imgly/background-removal-node';
 
 dotenv.config()
 
@@ -115,5 +116,27 @@ export const getLinkDetails = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
+export const removeImageBackground = async (req, res) => {
+  try {
+    const { image } = req.body;
+    
+    // Remove background
+    const blob = await removeBackground(image);
+    
+    // Convert to base64
+    const buffer = await blob.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    const dataUrl = `data:image/png;base64,${base64}`;
+    
+    res.json({ imageUrl: dataUrl });
+  } catch (error) {
+    console.error('Background removal error:', error);
+    res.status(500).json({ message: 'Background removal failed' });
   }
 };
