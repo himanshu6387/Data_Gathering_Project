@@ -20,7 +20,8 @@ const CollegeDashboard = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/college/students');
+      // const response = await axios.get('http://localhost:5000/api/college/students');
+      const response = await axios.get('https://data-gathering-project-backendd.onrender.com/api/college/students');
       setStudents(response.data);
     } catch (error) {
       toast.error('Failed to fetch students');
@@ -30,7 +31,8 @@ const CollegeDashboard = () => {
   const generateLink = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/college/generate-link');
+      // const response = await axios.post('http://localhost:5000/api/college/generate-link');
+      const response = await axios.post('https://data-gathering-project-backendd.onrender.com/api/college/generate-link');
       setGeneratedLink(response.data.link);
       toast.success('Student data collection link generated!');
     } catch (error) {
@@ -41,7 +43,8 @@ const CollegeDashboard = () => {
 
   const downloadExcel = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/college/download-excel', {
+      // const response = await axios.get('http://localhost:5000/api/college/download-excel', {
+      const response = await axios.get('https://data-gathering-project-backendd.onrender.com/api/college/download-excel', {
         responseType: 'blob',
       });
       
@@ -61,7 +64,8 @@ const CollegeDashboard = () => {
 
   const downloadImages = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/college/download-images', {
+      // const response = await axios.get('http://localhost:5000/api/college/download-images', {
+      const response = await axios.get('https://data-gathering-project-backendd.onrender.com/api/college/download-images', {
         responseType: 'blob',
       });
       
@@ -88,7 +92,8 @@ const CollegeDashboard = () => {
 
     setGeneratingIDCards(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/college/generate-id-cards', {
+      const response = await axios.get('https://data-gathering-project-backendd.onrender.com/api/college/generate-id-cards', {
+      // const response = await axios.get('http://localhost:5000/api/college/generate-id-cards', {
         responseType: 'blob',
       });
       
