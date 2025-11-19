@@ -44,30 +44,30 @@ const About = () => {
 
   const team = [
     {
-      name: "John Doe",
+      name: "Er. Yogendra Kumar",
       role: "Founder & CEO",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
+      image: "https://img.freepik.com/free-vector/young-man-with-glasses-avatar_1308-175763.jpg?t=st=1763543310~exp=1763546910~hmac=b07403ac663636d22a3f1cdef22627984ff71b6a28758a5a7de4ed6de2153852&w=1060"
     },
     {
-      name: "Jane Smith",
+      name: "Mr. Abhishek Kumar",
       role: "CTO",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"
+      image: "https://img.freepik.com/free-vector/man-shows-gesture-great-idea_10045-637.jpg?t=st=1763543481~exp=1763547081~hmac=a16f7bd15f7004c78a763fb19ab7e102680296a0b3e75607d380c2fade54bc26&w=1480"
     },
     {
-      name: "Mike Johnson",
+      name: "Er. Himanshu Mishra",
       role: "Lead Developer",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop"
+      image: "https://i.ibb.co/nqwVXxRw/IMG-20250421-113739-793.webp"
     }
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">About EduConnect</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">About DataCollect</h1>
           <p className="text-xl md:text-2xl text-indigo-100 max-w-3xl mx-auto animate-fade-in-up">
             Revolutionizing college management with innovative technology and user-centric design
           </p>
@@ -81,10 +81,26 @@ const About = () => {
             <div className="animate-fade-in-up">
               <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
               <p className="text-lg text-gray-600 mb-4">
-                At EduConnect, we believe in transforming the way educational institutions manage their data and operations. Our mission is to provide colleges with a powerful, yet simple-to-use platform that streamlines student management processes.
+                Welcome to All Around Aid, your trusted partner for printing, ID card creation, and customized gift items in Basti and nearby cities including Ayodhya, Gorakhpur, Khalilabad, Padrauna, Kushinagar, Prayagraj (Allahabad), Siddharthnagar, Dumariyaganj, and Bansi.
+                <br /><br />
+                We specialize in School ID Cards, Acrylic ID Cards, PVC & Plastic ID Cards, School Ties, Belts, Badges, and Personalized Gifts such as Photo Frames, Mugs, Bottles, T-Shirts, and Keychains — all crafted with precision and premium quality.
+                <br /><br />
+                At All Around Aid, we blend creativity with technology to deliver printing solutions that reflect your identity — whether it’s for schools, offices, or personal gifts. Our mission is to make customization simple, stylish, and affordable for everyone.
+
+                {/* At EduConnect, we believe in transforming the way educational institutions manage their data and operations. Our mission is to provide colleges with a powerful, yet simple-to-use platform that streamlines student management processes. */}
               </p>
+
+              <h2 className=' text-xl text-gray-600 mb-6'>🎯 Why Choose Us:</h2>
               <p className="text-lg text-gray-600 mb-6">
-                We're dedicated to helping educational institutions focus on what matters most - providing quality education - while we handle the administrative complexities.
+                
+                High-quality printing with durable materials
+                <br />
+                Fast and reliable delivery across Uttar Pradesh
+                <br />
+                Affordable pricing for bulk and single orders
+                <br />
+                Custom designs to match your brand or personal style
+                {/* We're dedicated to helping educational institutions focus on what matters most - providing quality education - while we handle the administrative complexities. */}
               </p>
               <div className="flex space-x-4">
                 <div className="text-center">
@@ -126,7 +142,7 @@ const About = () => {
               <div
                 key={index}
                 className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
-                style={{animationDelay: `${index * 0.1}s`}}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white mb-4">
                   {feature.icon}
@@ -152,13 +168,13 @@ const About = () => {
             {team.map((member, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
-                style={{animationDelay: `${index * 0.1}s`}}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up border-1 border-gray-200"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <img
                   src={member.image}
                   alt={member.name}
-                  className="w-full h-64 object-cover"
+                  className="w-full h-70 object-cover"
                 />
                 <div className="p-6 text-center">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>

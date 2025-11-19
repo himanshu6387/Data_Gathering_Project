@@ -60,7 +60,8 @@ const Header = () => {
                   <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
                     DataCollect
                   </span>
-                  <p className="text-xs text-gray-500 font-medium">College Management System</p>
+                  {/* <p className="text-xs text-gray-500 font-medium">College Management System</p> */}
+                  <p className="text-xs text-gray-500 font-medium">All Around Aid</p>
                 </div>
               </Link>
             </div>

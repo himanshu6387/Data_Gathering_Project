@@ -3,6 +3,7 @@
     "@imgly/background-removal-node": "^1.4.5",
     "archiver": "^7.0.1",
     "bcryptjs": "^3.0.2",
+    "canvas": "^3.2.0",
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -10,6 +11,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
+    "qrcode": "^1.5.4",
     "sharp": "^0.34.4",
     "uuid": "^13.0.0",
     "xlsx": "^0.18.5"

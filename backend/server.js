@@ -40,7 +40,8 @@ app.use(
 );
 
 // ✅ Must handle preflight requests globally
-app.options("*", cors());
+app.options(/.*/, cors());
+
 
 // ✅ JSON body limits
 app.use(express.json({ limit: "10mb" }));
